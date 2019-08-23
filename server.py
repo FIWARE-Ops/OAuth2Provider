@@ -15,6 +15,7 @@ import os
 import argparse
 import datetime
 import time
+import sys
 
 
 def parse_request_line(request_line):
@@ -64,7 +65,7 @@ class AESCipher(object):
 
 class Handler(http.server.BaseHTTPRequestHandler):
 
-    def reply(self, message=dict(), cookie=SimpleCookie(), code=200, cmd='', location=''):
+    def reply(self, message=None, cookie=None, code=200, cmd=None, location=None):
         self.send_response(code)
         if code == 301:
             self.send_header('Location', location)
@@ -215,10 +216,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    ip = args.ip
-    port = args.port
-    threads = args.threads
-    socks = args.socks
     client_id = args.client_id
     client_secret = args.client_secret
     redirect_uri = args.redirect_uri
@@ -227,7 +224,8 @@ if __name__ == '__main__':
     cookie_key = args.cookie_key
     cookie_lifetime = int(args.cookie_lifetime)
 
-    address = (ip, port)
+    address = (args.ip, args.port)
+    version_path = os.path.split(os.path.abspath(__file__))[0] + '/version'
 
     cmd_tec = ['ping', 'version']
     cmd_get = ['sign_in', 'callback', 'auth']
@@ -237,19 +235,28 @@ if __name__ == '__main__':
     crypt = AESCipher(cookie_key)
     auth = requests.auth.HTTPBasicAuth(client_id, client_secret)
 
-    version_file = open(os.path.split(os.path.abspath(__file__))[0] + '/version').read().split('\n')
     version = dict()
-    version['build'] = version_file[0]
-    version['commit'] = version_file[1]
+    if not os.path.isfile(version_path):
+        print(jsn.dumps({'message': 'Version file not found', 'code': 500, 'cmd': 'start'}, indent=2))
+        version_file = None
+        sys.exit(1)
+    try:
+        with open(version_path) as f:
+            version_file = f.read().split('\n')
+            version['build'] = version_file[0]
+            version['commit'] = version_file[1]
+    except IndexError:
+        print(jsn.dumps({'message': 'Unsupported version file type', 'code': 500, 'cmd': 'start'}, indent=2))
+        sys.exit(1)
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.bind(address)
-    sock.listen(socks)
+    sock.listen(args.socks)
 
-    [Thread(i) for i in range(threads)]
+    [Thread(i) for i in range(args.threads)]
 
-    print(jsn.dumps({'message': 'Service started', 'code': 200, 'threads': threads, 'socks': socks}, indent=2))
+    print(jsn.dumps({'message': 'Service started', 'code': 200}, indent=2))
 
     while True:
         time.sleep(9999)
