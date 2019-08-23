@@ -182,6 +182,12 @@ class Handler(http.server.BaseHTTPRequestHandler):
 
                             self.reply({'message': "Authorized"}, location=upstream, cookie=cookie, code=301, cmd=cmd)
                             return
+                else:
+                    self.reply({'message': 'Unauthorized'}, code=401, cmd=cmd)
+                    return
+            else:
+                self.reply({'message': 'Parameter "code" not found'}, code=404, cmd=cmd)
+                return
 
         message = {'message': 'Hook not found'}
         self.reply(message, code=404, cmd=cmd)
