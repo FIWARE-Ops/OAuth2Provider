@@ -50,10 +50,14 @@ class AESCipher(object):
         return base64.b64encode(iv + cipher.encrypt(raw))
 
     def decrypt(self, enc):
-        enc = base64.b64decode(enc)
-        iv = enc[:AES.block_size]
-        cipher = AES.new(self.key, AES.MODE_CBC, iv)
-        return self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+        try:
+            enc = base64.b64decode(enc)
+            iv = enc[:AES.block_size]
+            cipher = AES.new(self.key, AES.MODE_CBC, iv)
+            res = self._unpad(cipher.decrypt(enc[AES.block_size:])).decode('utf-8')
+        except ValueError:
+            return False
+        return res
 
     def _pad(self, s):
         return s + (self.bs - len(s) % self.bs) * chr(self.bs - len(s) % self.bs)
@@ -112,14 +116,16 @@ class Handler(http.server.BaseHTTPRequestHandler):
             cookie = self.headers.get('Cookie')
             status = False
             if cookie:
-                val = jsn.loads(crypt.decrypt(cookie.split('=', 1)[1]))
-                if 'session' in val:
-                    if 'expires' in val['session']:
-                        expires = datetime.datetime.strptime(val['session']['expires'][:-4], '%a, %d-%b-%Y %H:%M:%S')
-                        expires = expires.isoformat()
-                        now = time.strftime("%Y-%m-%dT%T", time.gmtime(time.time()))
-                        if expires > now:
-                            status = True
+                val = crypt.decrypt(cookie.split('=', 1)[1])
+                if val:
+                    val = jsn.loads(val)
+                    if 'session' in val:
+                        if 'expires' in val['session']:
+                            expires = datetime.datetime.strptime(val['session']['expires'][:-4], '%a, %d-%b-%Y %H:%M:%S')
+                            expires = expires.isoformat()
+                            now = time.strftime("%Y-%m-%dT%T", time.gmtime(time.time()))
+                            if expires > now:
+                                status = True
 
             if status:
                 self.reply({'message': 'Authorized'}, cmd=cmd)
