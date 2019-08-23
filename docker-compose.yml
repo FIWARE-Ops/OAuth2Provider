@@ -1,0 +1,22 @@
+version: '3'
+services:
+  oauth2provider:
+    image: fiware/service.oauth2provider:latest
+    command:
+      - '--keyrock=https://account.fiware.org'
+      - '--client_id=29a7edd7-4dcc-4c47-99a6-808383bd9d38'
+      - '--client_secret=de42f1a0-bcc9-4bbd-8889-92f20f9194af'
+      - '--redirect_uri=http://localhost/oauth2/callback'
+      - '--upstream=http://localhost/'
+      - '--cookie_key=hg83u4thb83iubgyoudfjbnosivun3084uybg3uohrvr'
+      - '--cookie_lifetime=24'
+
+  nginx:
+    image: nginx
+    ports:
+        - 0.0.0.0:80:80
+    volumes:
+      - "./default.conf:/etc/nginx/conf.d/default.conf"
+
+  echo:
+    image: caa06d9c/echo

@@ -1,0 +1,6 @@
+.*
+*.yml
+*.conf
+*.md
+LICENSE
+Dockerfile
