@@ -15,9 +15,9 @@ This is an alfa revision
 
 ## How to run
 ```console
-$ docker run -d fiware/service.oauth2provider \
-             --ip ${IP} \
-             --port ${PORT} \
+$ docker run -d \
+             -p 8080:8080 \
+             fiware/service.oauth2provider \
              --keyrock ${KEYROCK}
              --client_id ${CLIENT_ID}
              --client_secret ${CLIENT_SECRET}
@@ -40,10 +40,6 @@ $ curl http://localhost:8080/oauth2/ping
 + /oauth2/callback - entrypoint to Keyrock, preparing cookies, reply 301, 401
 + /oauth2/ping - reply pong
 + /oauth2/version - reply with version
-
-## Example with docker-compose
-+custom-nginx - simple nginx docker image with site config on board
-+echo-server  - simple tool that reply with "pong" (200)
 
 ## Sampe NGINX config
 Test configuration prepared, see `default.conf`. You can use docker-compose file to test it.

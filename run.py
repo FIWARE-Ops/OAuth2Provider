@@ -11,14 +11,20 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from datetime import datetime as dt, timedelta
 from os import path
 from yajl import dumps, loads
+import logging
 
 
 auth = None
 cipher_suite = None
+cookie_lifetime = None
 cookie_name = 'OAuth2Provider'
 http_ok = [200, 201, 204]
+keyrock = None
 location = None
+redirect_uri = None
 routes = web.RouteTableDef()
+upstream = None
+version = dict()
 
 
 @routes.get('/oauth2/auth')
@@ -97,12 +103,12 @@ async def get_handler(request):
 
 @routes.get('/oauth2/ping')
 async def get_handler(request):
-    return web.json_response({'message': 'Pong'}, dumps=dumps)
+    return web.Response(text = 'Pong')
 
 
 @routes.get('/oauth2/version')
 async def get_handler(request):
-    return web.json_response(version, dumps=dumps)
+    return web.Response(text=version)
 
 
 if __name__ == '__main__':
@@ -127,19 +133,18 @@ if __name__ == '__main__':
     upstream = args.upstream
     cookie_lifetime = int(args.cookie_lifetime)
 
-    version_path = path.split(path.abspath(__file__))[0] + '/version'
-    version = dict()
+    version_path = './version'
     if not path.isfile(version_path):
-        print(dumps({'message': 'Version file not found', 'code': 500, 'cmd': 'start'}, indent=2))
-        version_file = None
+        logging.error('Version file not found')
         exit(1)
     try:
         with open(version_path) as f:
             version_file = f.read().split('\n')
             version['build'] = version_file[0]
             version['commit'] = version_file[1]
+            version = dumps(version)
     except IndexError:
-        print(dumps({'message': 'Unsupported version file type', 'code': 500, 'cmd': 'start'}, indent=2))
+        logging.error('Unsupported version file type')
         exit(1)
 
     auth = BasicAuth(args.client_id, args.client_secret)
