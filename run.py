@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from aiohttp import web, BasicAuth, ClientSession, client_exceptions
+from asyncio import TimeoutError, set_event_loop_policy
 from argparse import ArgumentParser
 from base64 import urlsafe_b64encode, urlsafe_b64decode
 from cryptography.fernet import Fernet
@@ -11,6 +12,7 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from datetime import datetime as dt, timedelta
 from logging import error, getLogger
 from os import path
+from uvloop import EventLoopPolicy
 from yajl import dumps, loads
 
 
@@ -133,6 +135,7 @@ if __name__ == '__main__':
     cookie_lifetime = int(args.cookie_lifetime)
 
     getLogger().setLevel(40)
+    set_event_loop_policy(EventLoopPolicy())
 
     version_path = './version'
     if not path.isfile(version_path):
