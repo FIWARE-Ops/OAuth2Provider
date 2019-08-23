@@ -9,9 +9,9 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from datetime import datetime as dt, timedelta
+from logging import error, getLogger
 from os import path
 from yajl import dumps, loads
-import logging
 
 
 auth = None
@@ -132,9 +132,11 @@ if __name__ == '__main__':
     upstream = args.upstream
     cookie_lifetime = int(args.cookie_lifetime)
 
+    getLogger().setLevel(40)
+
     version_path = './version'
     if not path.isfile(version_path):
-        logging.error('Version file not found')
+        error('Version file not found')
         exit(1)
     try:
         with open(version_path) as f:
@@ -143,7 +145,7 @@ if __name__ == '__main__':
             version['commit'] = version_file[1]
             version = dumps(version)
     except IndexError:
-        logging.error('Unsupported version file type')
+        error('Unsupported version file type')
         exit(1)
 
     auth = BasicAuth(args.client_id, args.client_secret)
@@ -156,12 +158,10 @@ if __name__ == '__main__':
     app = web.Application()
     app.add_routes(routes)
 
-    salt = args.salt.encode()
-
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),
         length=32,
-        salt=salt,
+        salt=args.salt.encode(),
         iterations=100000,
         backend=default_backend()
     )
