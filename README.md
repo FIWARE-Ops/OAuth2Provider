@@ -2,6 +2,7 @@
 
 # OAuth2 Provider for Keyrock and NGINX
 [![Docker badge](https://img.shields.io/docker/pulls/fiware/service.oauth2provider.svg)](https://hub.docker.com/r/fiware/service.oauth2provider/)
+[![Build Status](https://travis-ci.org/FIWARE-Ops/OAuth2Provider.svg?branch=master)](https://travis-ci.org/FIWARE-Ops/OAuth2Provider)
 
 ## Overview
 This project is part of [FIWARE](https://fiware.org) OPS infrastructure.
