@@ -114,17 +114,16 @@ async def get_handler(request):
 if __name__ == '__main__':
 
     parser = ArgumentParser()
-    parser.add_argument('--ip', dest="ip", default='0.0.0.0', help='ip address (default: 0.0.0.0)', action="store")
-    parser.add_argument('--port', dest="port", default=8080, help='port (default: 8080)', action="store")
-    parser.add_argument('--client_id', dest='client_id', required=True, help='client_id', action="store")
-    parser.add_argument('--client_secret', dest='client_secret', required=True, help='client_secret', action="store")
-    parser.add_argument('--redirect_uri', dest='redirect_uri', required=True, help='redirect_uri', action="store")
-    parser.add_argument('--keyrock', dest='keyrock', required=True, help='OAuth2 provider', action="store")
-    parser.add_argument('--upstream', dest='upstream', required=True, help='upstream', action="store")
-    parser.add_argument('--cookie_key', dest='cookie_key', required=True, help='password to encrypt cookie',
-                        action="store")
-    parser.add_argument('--cookie_lifetime', dest='cookie_lifetime', required=True, help='lifetime in hours',
-                        action="store")
+    parser.add_argument('--ip', default='0.0.0.0', help='ip to use, default is 0.0.0.0')
+    parser.add_argument('--port', default=8080, help="port to use, default is 8080")
+    parser.add_argument('--client_id', required=True)
+    parser.add_argument('--client_secret', required=True)
+    parser.add_argument('--redirect_uri', required=True)
+    parser.add_argument('--keyrock', required=True)
+    parser.add_argument('--upstream', required=True)
+    parser.add_argument('--cookie_key', required=True)
+    parser.add_argument('--cookie_lifetime', required=True)
+    parser.add_argument('--salt', required=True)
 
     args = parser.parse_args()
 
@@ -157,7 +156,7 @@ if __name__ == '__main__':
     app = web.Application()
     app.add_routes(routes)
 
-    salt = b'dfvuy3947r397gfbcvdfvaofp398434'
+    salt = args.salt.encode()
 
     kdf = PBKDF2HMAC(
         algorithm=hashes.SHA256(),

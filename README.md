@@ -23,8 +23,9 @@ $ docker run -d \
              --client_secret ${CLIENT_SECRET}
              --redirect_uri ${REDIRECT_URI}
              --upstream ${UPSTREAM}
-             --cookie_key=${BIG_RANDOM_NUMBER}
-             --cookie_lifetime=${TIME_IN_HOURS}
+             --cookie_key ${BIG_RANDOM_NUMBER}
+             --cookie_lifetime ${TIME_IN_HOURS}
+             --salt ${SALT}
 ```
 ```console
 $ curl http://localhost:8080/oauth2/ping
