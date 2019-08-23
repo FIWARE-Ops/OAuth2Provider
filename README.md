@@ -15,8 +15,8 @@ This is an alfa revision
 
 ## How to run
 ```console
-$ docker run -d \
-             -p 8080:8080 \
+$ docker run -it --rm \
+             -p 0.0.0.0:8080:8080 \
              fiware/service.oauth2provider \
              --keyrock ${KEYROCK}
              --client_id ${CLIENT_ID}

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from aiohttp import web, BasicAuth, ClientSession, client_exceptions
+from aiohttp import web, BasicAuth, ClientSession, ClientConnectorError
 from asyncio import TimeoutError, set_event_loop_policy
 from argparse import ArgumentParser
 from base64 import urlsafe_b64encode, urlsafe_b64decode
@@ -43,11 +43,14 @@ async def get_handler(request):
     try:
         async with ClientSession() as session:
             async with session.get(url, params=params) as response:
-                await response.read()
-    except client_exceptions.ClientConnectorError:
+                await response.text()
+                status = response.status
+    except ClientConnectorError:
+        return web.HTTPUnauthorized()
+    except TimeoutError:
         return web.HTTPUnauthorized()
 
-    if response.status not in http_ok:
+    if status not in http_ok:
         return web.HTTPUnauthorized()
 
     if dt.utcnow().isoformat() > cookie['expires']:
@@ -70,16 +73,19 @@ async def get_handler(request):
         async with ClientSession() as session:
             async with session.post(url, auth=auth, data=data, headers=headers) as response:
                 content = loads(await response.text())
-    except client_exceptions.ClientConnectorError:
+                status = response.status
+    except ClientConnectorError:
+        return web.HTTPUnauthorized()
+    except TimeoutError:
         return web.HTTPUnauthorized()
 
-    if response.status not in http_ok:
+    if status not in http_ok:
         return web.HTTPUnauthorized()
 
     if 'access_token' not in content:
         return web.HTTPUnauthorized()
 
-    expires = dt.utcnow() + timedelta(seconds=cookie_lifetime)
+    expires = dt.utcnow() + timedelta(hours=cookie_lifetime)
     expires_cookie = dt.strftime(expires, '%a, %d-%b-%Y %H:%M:%S')
 
     value = {
@@ -124,7 +130,7 @@ if __name__ == '__main__':
     parser.add_argument('--keyrock', required=True)
     parser.add_argument('--upstream', required=True)
     parser.add_argument('--cookie_key', required=True)
-    parser.add_argument('--cookie_lifetime', required=True)
+    parser.add_argument('--cookie_lifetime', required=True, help="cookie lifetime in hours")
     parser.add_argument('--salt', required=True)
 
     args = parser.parse_args()
