@@ -1,0 +1,17 @@
+if: branch = master and not type IN (pull_request)
+dist: trusty
+sudo: false
+language: minimal
+before_install: true
+install: true
+before_script: true
+script:
+- echo ${DOCKER_PASSWORD} | docker login -u ${DOCKER_USERNAME} --password-stdin
+- echo ${TRAVIS_BUILD_NUMBER} > version
+- echo ${TRAVIS_COMMIT} >> version
+- docker build  --no-cache -t fiware/service.oauth2provider .
+- docker push fiware/service.oauth2provider
+env:
+  global:
+  - secure: PMo3SRuOml5VEWIWXvtrTP7f7WzUZts/rMuk7GnqcIH5CHhjBQvG8K+lcP7qt///kK6oPl50kd+He9RfkTKM2Iwv0kOjj1NsSlQRFwzI65OeETM4M+WQOqlIMb7Mf4kZ6vs+Z4qkQncevIrQi3tm3V+yoE5ZIdw3MQfNopRJUeBpkD4tLgevG2XxyiXKTZuD0x7GquT28vEnTbDcpbl943+xHtDJeAeUI7iOiqH7/UwpBZFGcRK5yknUOnWDnvHEJD8ME/f5/F9465fCQMZZbCAVGtbPSA+Nw6ukD62Nnr9ch7+RuiT42egtMTRYqF03CE0dC3S10MQGMawz62plJHNPQaBr2ih157c+Vczsgln5xlfmwikVNJttg0Wx49jBvlXkFMt0YbMwyRB1aB/9eSNnMt4qns4XJvWtcxvFS0fcwSAwK2ZEG7iPhDi/5IbY1x6UtM4JORvVv6takah5Si9aF5v/ysiG2vDF9/SfU038BFSyEGWzvN6fzru9xdrw+Yyt017w/Y3w3J2ep39BTOlHQ1blmKQ6MQuDd87gd1QvQexXphe3FMmdrVLV9QG6mE5SefbdgILpPRSKeYR4cO1UV4o4sI4N56mLAnc+RcdyAvyCG3TxXJ7sT0/BMM3FghnDZnrfjScQYT2fc27Nhr8jMMPKBgktgXja8Fb1Jns=
+  - secure: oceeHFkvGNnEUcWl++8C8uUC4KZFrZIoxtz8dxooRZM77g9O/G8Fe2B9lZjlVm8b2jRnZaFt8nbbQJFWdpD6UM3yRTYhDh7L6J4iaWxnj7epz/o6cYqqzkQ8XUm0sXc/N39hSSACnLLiQ4xyhqbP47LQZ8cgyrlB3xVGh2sQQh3TyVk+BnHpbJg6+uQ4Rng6B4SOH6DHennRF06jbqWgb7T4i1EKMvqSyqbUEOmBr0qQlwpYNKWON1M5BRY3lpdHdcRoLkMhVLgJBsJwQnnhHUYUmv+Ddt3f2LBsAdJrBLXzSGmX5hk/JAL84yvOU8vUzeNXmV8HaxPdo3h6TS6ElzFE1cmcJC9eZQ5Ra+0bvl7aGIZZZ9itu5TliLw6P/t8ZONfZ1tNa4JrpVUT+FvqBJ0z2F1KTFt8tbnuTrInVw7Ws8kP0pQTq7BFmu/1l2jNQ8BgBTrM64amVBLhlGy8sv8a0FDt59gkzZq1VwwCDEx72A8X9xiRe6L5HbZ/dDiCxe0DyD37Kbz8lPmplnB5ISjMrVxfcktz8TKje2cSHuqlZxmsPNtrIs3cHIZosDGXBR031O6AR/O8KQWnMqkK90nWTZbJys4aDCyNAqzElq1s83hLR1PeQF07UhX8P+2mPkFKJhPXUm7aH8hl2ltRtzLCA74mgvcCiGUiuIz7RW4=
