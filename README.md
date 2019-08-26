@@ -36,9 +36,9 @@ $ curl http://localhost:8080/oauth2/ping
 + Cookie_key uses to encrypt cookie
 
 ## List of endpoints
-+ /oauth2/auth - check validity of cookie prepared by other endpoint, reply 200, 401
-+ /oauth2/sign_in - redirect to Keyrock, reply 301
-+ /oauth2/callback - entrypoint to Keyrock, preparing cookies, reply 301, 401
++ /oauth2/auth - check validity of cookie prepared by other endpoints, reply 200, 401
++ /oauth2/sign_in - redirect to Keyrock, reply 303
++ /oauth2/callback - entrypoint for Keyrock, validate a token, preparing cookies, reply 303, 403
 + /oauth2/ping - reply pong
 + /oauth2/version - reply with version
 
