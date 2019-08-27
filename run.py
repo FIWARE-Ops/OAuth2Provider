@@ -80,10 +80,10 @@ async def get_handler(request):
         return web.HTTPUnauthorized()
 
     if status not in http_ok:
-        return web.HTTPUnauthorized()
+        return web.HTTPForbidden()
 
     if 'access_token' not in content:
-        return web.HTTPUnauthorized()
+        return web.HTTPForbidden()
 
     url = keyrock + '/user'
     try:
@@ -92,9 +92,9 @@ async def get_handler(request):
                 content = loads(await response.text())
                 status = response.status
     except ClientConnectorError:
-        return web.HTTPUnauthorized()
+        return web.HTTPForbidden()
     except TimeoutError:
-        return web.HTTPUnauthorized()
+        return web.HTTPForbidden()
 
     if status not in http_ok:
         return web.HTTPForbidden()
