@@ -51,7 +51,7 @@ async def get_handler(request):
         return web.HTTPUnauthorized()
 
     if status not in http_ok:
-        return web.HTTPUnauthorized()
+        return web.HTTPForbidden()
 
     if dt.utcnow().isoformat() > cookie['expires']:
         return web.HTTPUnauthorized()
@@ -80,24 +80,10 @@ async def get_handler(request):
         return web.HTTPUnauthorized()
 
     if status not in http_ok:
-        return web.HTTPForbidden()
+        return web.HTTPUnauthorized()
 
     if 'access_token' not in content:
-        return web.HTTPForbidden()
-
-    url = keyrock + '/user'
-    try:
-        async with ClientSession() as session:
-            async with session.get(url, auth=auth) as response:
-                content = loads(await response.text())
-                status = response.status
-    except ClientConnectorError:
-        return web.HTTPForbidden()
-    except TimeoutError:
-        return web.HTTPForbidden()
-
-    if status not in http_ok:
-        return web.HTTPForbidden()
+        return web.HTTPUnauthorized()
 
     expires = dt.utcnow() + timedelta(hours=cookie_lifetime)
     expires_cookie = dt.strftime(expires, '%a, %d-%b-%Y %H:%M:%S')
